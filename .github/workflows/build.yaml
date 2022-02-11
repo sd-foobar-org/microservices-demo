@@ -1,0 +1,157 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  GO_VERSION: 1.16
+
+jobs:
+  # run change detection
+  changes:
+    runs-on: ubuntu-latest
+    # Set job outputs to values from filter step
+    outputs:
+      adservice: ${{ steps.filter.outputs.adservice }}
+      cartservice: ${{ steps.filter.outputs.cartservice }}
+      checkoutservice: ${{ steps.filter.outputs.checkoutservice }}
+      currencyservice: ${{ steps.filter.outputs.currencyservice }}
+      emailservice: ${{ steps.filter.outputs.emailservice }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      paymentservice: ${{ steps.filter.outputs.paymentservice }}
+      productcatalogservice: ${{ steps.filter.outputs.productcatalogservice }}
+      recommendationservice: ${{ steps.filter.outputs.recommendationservice }}
+      shippingservice: ${{ steps.filter.outputs.shippingservice }}
+    steps:
+      # The paths-filter action requires a checkout step for push events.
+      - if: ${{ github.event_name == 'push' }}
+        uses: actions/checkout@v2
+
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            adservice:
+              - 'src/adservice/**'
+            cartservice:
+              - 'src/cartservice/**'
+            checkoutservice:
+              - 'src/checkoutservice/**'
+            currencyservice:
+              - 'src/currencyservice/**'
+            emailservice:
+              - 'src/emailservice/**'
+            frontend:
+              - 'src/frontend/**'
+            paymentservice:
+              - 'src/paymentservice/**'
+            productcatalogservice:
+              - 'src/productcatalogservice/**'
+            recommendationservice:
+              - 'src/recommendationservice/**'
+            shippingservice:
+              - 'src/shippingservice/**'
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [ changes ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Docker Login
+        uses: docker/login-action@v1.9.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build adservice image
+        if: ${{ needs.changes.outputs.adservice == 'true' }}
+        uses: docker/build-push-action@v2
+        with:
+          context: './src/adservice'
+          file: './src/adservice/Dockerfile'
+          push: true
+          tags: jmsktm/microservices-demo-adservice:${{ github.sha }}
+
+      - name: Build cartservice image
+        if: ${{ needs.changes.outputs.cartservice == 'true' }}
+        uses: docker/build-push-action@v2
+        with:
+          context: './src/cartservice'
+          file: './src/cartservice/Dockerfile'
+          push: true
+          tags: jmsktm/microservices-demo-cartservice:${{ github.sha }}
+
+      - name: Build checkoutservice image
+        if: ${{ needs.changes.outputs.checkoutservice == 'true' }}
+        uses: docker/build-push-action@v2
+        with:
+          context: './src/checkoutservice'
+          file: './src/checkoutservice/Dockerfile'
+          push: true
+          tags: jmsktm/microservices-demo-checkoutservice:${{ github.sha }}
+
+      - name: Build currencyservice image
+        if: ${{ needs.changes.outputs.currencyservice == 'true' }}
+        uses: docker/build-push-action@v2
+        with:
+          context: './src/currencyservice'
+          file: './src/currencyservice/Dockerfile'
+          push: true
+          tags: jmsktm/microservices-demo-currencyservice:${{ github.sha }}
+
+      - name: Build emailservice image
+        if: ${{ needs.changes.outputs.emailservice == 'true' }}
+        uses: docker/build-push-action@v2
+        with:
+          context: './src/emailservice'
+          file: './src/emailservice/Dockerfile'
+          push: true
+          tags: jmsktm/microservices-demo-emailservice:${{ github.sha }}
+
+      - name: Build frontend image
+        if: ${{ needs.changes.outputs.frontend == 'true' }}
+        uses: docker/build-push-action@v2
+        with:
+          context: './src/frontend'
+          file: './src/frontend/Dockerfile'
+          push: true
+          tags: jmsktm/microservices-demo-frontend:${{ github.sha }}
+
+      - name: Build paymentservice image
+        if: ${{ needs.changes.outputs.paymentservice == 'true' }}
+        uses: docker/build-push-action@v2
+        with:
+          context: './src/paymentservice'
+          file: './src/paymentservice/Dockerfile'
+          push: true
+          tags: jmsktm/microservices-demo-paymentservice:${{ github.sha }}
+
+      - name: Build productcatalogservice image
+        if: ${{ needs.changes.outputs.productcatalogservice == 'true' }}
+        uses: docker/build-push-action@v2
+        with:
+          context: './src/productcatalogservice'
+          file: './src/productcatalogservice/Dockerfile'
+          push: true
+          tags: jmsktm/microservices-demo-productcatalogservice:${{ github.sha }}
+
+      - name: Build recommendationservice image
+        if: ${{ needs.changes.outputs.recommendationservice == 'true' }}
+        uses: docker/build-push-action@v2
+        with:
+          context: './src/recommendationservice'
+          file: './src/recommendationservice/Dockerfile'
+          push: true
+          tags: jmsktm/microservices-demo-recommendationservice:${{ github.sha }}
+
+      - name: Build shippingservice image
+        if: ${{ needs.changes.outputs.shippingservice == 'true' }}
+        uses: docker/build-push-action@v2
+        with:
+          context: './src/shippingservice'
+          file: './src/shippingservice/Dockerfile'
+          push: true
+          tags: jmsktm/microservices-demo-shippingservice:${{ github.sha }}
