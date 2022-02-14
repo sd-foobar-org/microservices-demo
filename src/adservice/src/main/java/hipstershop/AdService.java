@@ -56,7 +56,7 @@ public final class AdService {
   private static final Tracer tracer = Tracing.getTracer();
 
   @SuppressWarnings("FieldCanBeLocal")
-  private static int MAX_ADS_TO_SERVE = 2;
+  private static int MAX_ADS_TO_SERVE = 3;
 
   private Server server;
   private HealthStatusManager healthMgr;
