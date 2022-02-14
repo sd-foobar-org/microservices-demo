@@ -1,0 +1,52 @@
+plugins {
+    id 'java'
+    // id 'com.google.protobuf' version '0.8.17'
+}
+
+// protobuf {
+//  protoc {
+//    artifact = "com.google.protobuf:protoc:3.19.2"
+//  }
+//  plugins {
+//    grpc {
+//      artifact = 'io.grpc:protoc-gen-grpc-java:1.44.0'
+//    }
+//  }
+//  generateProtoTasks {
+//    all()*.plugins {
+//      grpc {}
+//    }
+//  }
+//}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://oss.sonatype.org/service/local/repositories/snapshots/content/'
+    }
+}
+
+dependencies {
+    compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
+    testImplementation 'io.grpc:grpc-protobuf:1.44.0'
+    testImplementation 'io.grpc:grpc-stub:1.44.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
+    testImplementation 'io.rest-assured:rest-assured:4.4.0'
+    testImplementation 'org.testng:testng:7.4.0'
+    testImplementation 'com.signadot:signadot-sdk:0.1.4'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
+    testRuntimeOnly 'io.grpc:grpc-netty-shaded:1.44.0'
+}
+
+repositories {
+    flatDir {
+        dirs 'lib'
+    }
+}
+
+test {
+    useTestNG()
+}
